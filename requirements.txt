@@ -1,2 +1,15 @@
-# No external dependencies required
-# Все библиотеки встроенные (os, shutil, re, datetime, argparse, unittest)
+
+# Основной фреймворк для GUI
+flet>=0.25.0
+
+# Дополнительные возможности Flet (включает анимации и т.д.)
+# flet[all]>=0.25.0  # раскомментируйте, если нужно
+
+# Все остальные библиотеки — встроенные:
+#   - os
+#   - shutil
+#   - re
+#   - datetime
+#   - argparse
+#   - unittest
+#   - tempfile
