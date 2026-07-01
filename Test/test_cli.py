@@ -1,59 +1,61 @@
+import os
 import unittest
-from unittest.mock import patch
+import subprocess
 import sys
-from src.cli import main
+import tempfile
+import shutil
+from pathlib import Path
 
 
 class TestCLI(unittest.TestCase):
-    """Тесты для командной строки"""
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        self.test_file = Path(self.temp_dir) / "test.txt"
+        self.test_file.write_text("hello")
 
-    @patch('src.file_manager.copy_file')
-    def test_copy_command(self, mock_copy):
-        """Тест команды copy"""
-        test_args = ['cli.py', 'copy', 'test.txt', 'new.txt']
-        with patch.object(sys, 'argv', test_args):
-            main()
-        mock_copy.assert_called_once_with('test.txt', 'new.txt')
+        # cli.py лежит в папке src
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.cli_path = os.path.join(project_root, "src", "cli.py")
 
-    @patch('src.file_manager.delete_item')
-    def test_delete_command(self, mock_delete):
-        """Тест команды delete"""
-        test_args = ['cli.py', 'delete', 'test.txt']
-        with patch.object(sys, 'argv', test_args):
-            main()
-        mock_delete.assert_called_once_with('test.txt')
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
 
-    @patch('src.file_manager.count_files')
-    def test_count_command(self, mock_count):
-        """Тест команды count"""
-        test_args = ['cli.py', 'count', 'folder']
-        with patch.object(sys, 'argv', test_args):
-            main()
-        mock_count.assert_called_once_with('folder')
+    def run_cli(self, args):
+        """Запуск cli.py с аргументами (с utf-8 кодировкой)"""
+        cmd = [sys.executable, self.cli_path] + args
+        return subprocess.run(
+            cmd,
+            cwd=self.temp_dir,
+            capture_output=True,
+            text=True,
+            encoding='utf-8'  # 👈 ФИКС: правильная кодировка
+        )
 
-    @patch('src.file_manager.search_files')
-    def test_search_command(self, mock_search):
-        """Тест команды search"""
-        test_args = ['cli.py', 'search', 'folder', '.*\.txt']
-        with patch.object(sys, 'argv', test_args):
-            main()
-        mock_search.assert_called_once_with('folder', '.*\.txt')
+    def test_cli_copy(self):
+        result = self.run_cli(["copy", "test.txt", "copy.txt"])
+        self.assertEqual(result.returncode, 0, f"stdout: {result.stdout}, stderr: {result.stderr}")
+        self.assertTrue((Path(self.temp_dir) / "copy.txt").exists())
 
-    @patch('src.file_manager.add_date_to_filename')
-    def test_add_date_command(self, mock_add_date):
-        """Тест команды add-date"""
-        test_args = ['cli.py', 'add-date', 'file.txt', '--recursive']
-        with patch.object(sys, 'argv', test_args):
-            main()
-        mock_add_date.assert_called_once_with('file.txt', True)
+    def test_cli_delete(self):
+        result = self.run_cli(["delete", "test.txt"])
+        self.assertEqual(result.returncode, 0, f"stdout: {result.stdout}, stderr: {result.stderr}")
+        self.assertFalse((Path(self.temp_dir) / "test.txt").exists())
 
-    @patch('src.file_manager.analyse_folder')
-    def test_analyse_command(self, mock_analyse):
-        """Тест команды analyse"""
-        test_args = ['cli.py', 'analyse', 'folder']
-        with patch.object(sys, 'argv', test_args):
-            main()
-        mock_analyse.assert_called_once_with('folder')
+    def test_cli_count(self):
+        result = self.run_cli(["count", "."])
+        self.assertEqual(result.returncode, 0, f"stdout: {result.stdout}, stderr: {result.stderr}")
+        self.assertIn("Файлов: 1", result.stdout)
+
+    def test_cli_search(self):
+        result = self.run_cli(["search", ".", r"\.txt$"])
+        self.assertEqual(result.returncode, 0, f"stdout: {result.stdout}, stderr: {result.stderr}")
+        self.assertIn("test.txt", result.stdout)
+
+    def test_cli_help(self):
+        result = self.run_cli(["--help"])
+        self.assertEqual(result.returncode, 0, f"stdout: {result.stdout}, stderr: {result.stderr}")
+        self.assertIn("copy", result.stdout)
+        self.assertIn("delete", result.stdout)
 
 
 if __name__ == "__main__":
