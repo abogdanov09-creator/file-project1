@@ -8,7 +8,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.file_manager import add_date_to_filename
+from file_manager.commands import add_date_to_filename
 
 
 class TestAddDate(unittest.TestCase):

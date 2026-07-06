@@ -1,12 +1,11 @@
 
-
-import sys
-import os
-
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+"""
+Файловый менеджер (CLI)
+"""
 
 import argparse
-from file_manager import (
+import sys
+from file_manager.commands import (
     copy_file,
     delete_file,
     count_files,
@@ -31,22 +30,18 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command", required=True, help="Команды")
 
-    # COPY (3 балла)
     p_copy = subparsers.add_parser("copy", help="Копировать файл")
     p_copy.add_argument("source", help="Исходный файл")
     p_copy.add_argument("destination", help="Куда копировать")
 
-    # DELETE (3 балла)
     p_del = subparsers.add_parser("delete", help="Удалить файл или папку")
     p_del.add_argument("path", help="Путь")
     p_del.add_argument("-r", "--recursive", action="store_true", help="Удалять папки рекурсивно")
-    p_del.add_argument("-f", "--force", action="store_true", help="Принудительно (игнорировать ошибки)")
+    p_del.add_argument("-f", "--force", action="store_true", help="Принудительно")
 
-    # COUNT (4 балла)
     p_cnt = subparsers.add_parser("count", help="Подсчитать количество файлов")
     p_cnt.add_argument("path", nargs="?", default=".", help="Путь к папке")
 
-    # SEARCH (4 балла)
     p_search = subparsers.add_parser("search", help="Поиск по regex")
     p_search.add_argument("path", help="Путь для поиска")
     p_search.add_argument("pattern", help="Регулярное выражение")
@@ -54,13 +49,11 @@ def main():
     p_search.add_argument("--no-recursive", action="store_true", help="Отключить рекурсию")
     p_search.add_argument("-c", "--case-sensitive", action="store_true", help="Учитывать регистр")
 
-    # ADD_DATE (6 баллов)
     p_date = subparsers.add_parser("add_date", help="Добавить дату создания в имя")
     p_date.add_argument("path", help="Файл или папка")
     p_date.add_argument("-r", "--recursive", action="store_true", help="Рекурсивно")
     p_date.add_argument("-d", "--dry-run", action="store_true", help="Только показать")
 
-    # ANALYSE (10 баллов)
     p_anal = subparsers.add_parser("analyse", aliases=["analyze"], help="Анализ размера")
     p_anal.add_argument("path", nargs="?", default=".", help="Путь")
     p_anal.add_argument("-s", "--sort", choices=["size", "name"], default="size", help="Сортировка")
@@ -68,7 +61,6 @@ def main():
 
     args = parser.parse_args()
 
-    # Вызов команд
     try:
         if args.command == "copy":
             success, msg, _ = copy_file(args.source, args.destination)

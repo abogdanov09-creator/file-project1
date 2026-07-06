@@ -4,7 +4,7 @@ import tempfile
 import shutil
 from pathlib import Path
 import sys
-from src.file_manager import copy_file
+from file_manager.commands import copy_file
 # Добавляем корень проекта в путь
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

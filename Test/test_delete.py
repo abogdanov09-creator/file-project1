@@ -7,7 +7,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.file_manager import delete_file
+from file_manager.commands import delete_file
 
 
 class TestDelete(unittest.TestCase):

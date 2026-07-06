@@ -7,7 +7,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.file_manager import search_files
+from file_manager.commands import search_files
 
 
 class TestSearch(unittest.TestCase):

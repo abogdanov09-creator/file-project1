@@ -1,7 +1,4 @@
-"""
-Файловый менеджер — вся логика в одном файле
-Каждая функция возвращает (success: bool, message: str, data: any)
-"""
+
 
 import os
 import re

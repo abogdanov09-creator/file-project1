@@ -7,7 +7,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.file_manager import count_files
+from file_manager.commands import count_files
 
 
 class TestCount(unittest.TestCase):
